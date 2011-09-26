@@ -1,14 +1,16 @@
 --This is an implementation of the get-shit-done script in haskell.
 
 import System.Environment 
-import System.Directory 
+import System.Directory
+import System.Process 
 import System.IO 
 import Data.List
 import Control.Exception 
+import Control.Monad
 
 dispatch :: String -> [String] -> IO ()
---dispatch "work" = work
---dispatch "play" = play
+dispatch "work" = work
+dispatch "play" = play
 dispatch "view" = view
 dispatch "add" = add
 dispatch "remove" = remove
@@ -19,6 +21,32 @@ main = do
 
 hosts = "test_hosts.txt"
 blacklist = "blacklist.txt" 
+startToken = "## startToken"
+endToken = "## endToken"
+
+work :: [String] -> IO ()
+work [] = do
+	blacklistContents <- readFile blacklist
+	hostsContents <- readFile hosts 
+	let sites = lines blacklistContents
+	    hostsList = lines hostsContents  
+	    formattedSites = map (\line -> "127.0.0.1\t" ++ line) sites
+	    bookendedSites = [startToken] ++ formattedSites ++ [endToken]
+	when (startToken `elem` hostsList) $ error "Work mode already set."
+	appendFile hosts (unlines bookendedSites)
+	
+play :: [String] -> IO ()
+play [] = do
+	hostsContents <- readFile hosts
+	let hostsList = lines hostsContents
+	when (not (startToken `elem` hostsList)) $ error "Play mode already set."
+	let breakList = break (==startToken) hostsList
+	    newHosts = unlines $ (fst breakList)
+	(tempName, tempHandle) <- openTempFile "." "temp"
+	hPutStr tempHandle newHosts
+	hClose tempHandle
+	removeFile hosts
+	renameFile tempName hosts	 
 
 view :: [String] -> IO ()
 view [] = do
@@ -39,5 +67,5 @@ remove [numberString] = do
 	(tempName, tempHandle) <- openTempFile "." "temp"
 	hPutStr tempHandle newBannedSites
 	hClose tempHandle
-	removeFile "blacklist.txt"
-	renameFile tempName "blacklist.txt"	
+	removeFile blacklist
+	renameFile tempName blacklist	
