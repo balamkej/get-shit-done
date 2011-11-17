@@ -1,4 +1,4 @@
---This is an implementation of the get-shit-done script in haskell. It particular, it is set up to play well with dnsmasq in mac os x lion.
+--This is an implementation of the get-shit-done (github.com/leftnode/get-shit-done) script in haskell. It particular, it is set up to play well with dnsmasq in mac os x lion.
 
 import System.Environment 
 import System.Directory
