@@ -1,0 +1,5 @@
+This is haskell fork of github.com/leftnode/get-shit-done, "an easy to use command line program that blocks websites known to distract us from our work." 
+
+I've spiced it up with some new arguments to view, edit, and delete domains from the blacklist. 
+
+It's currently set up to play well with dnsmasq on linux os x. It would be trivial to change the hosts variable to your /etc/hosts and disable the function resetting the dns server.
